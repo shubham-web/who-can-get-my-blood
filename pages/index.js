@@ -179,7 +179,7 @@ export default class Home extends Component {
 					</div>
 				</main>
 				<footer>
-					Original Work: <a href="https://codepen.io/RominaMartin/full/OJVdvRm">Romina Martín's Codepen</a>
+					⭐ Original Work: <a href="https://codepen.io/RominaMartin/full/OJVdvRm">Romina Martín's Codepen</a> ⭐
 				</footer>
 			</div>
 		);
