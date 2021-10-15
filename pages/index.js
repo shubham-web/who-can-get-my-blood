@@ -1,65 +1,187 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import { Component } from "react";
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+export default class Home extends Component {
+	componentDidMount() {
+		const BLOOD_TYPES = {
+			"O−": ["O−", "O+", "A−", "A+", "B−", "B+", "AB−", "AB+"],
+			"O+": ["O+", "A+", "B+", "AB+"],
+			"A−": ["A−", "A+", "AB−", "AB+"],
+			"A+": ["A+", "AB+"],
+			"B−": ["B−", "B+", "AB−", "AB+"],
+			"B+": ["B+", "AB+"],
+			"AB−": ["AB−", "AB+"],
+			"AB+": ["AB+"],
+		};
+		const selector = document.getElementById("blood_selector");
+		const o_negative = document.querySelector(".o_negative");
+		const blood_vias = document.querySelectorAll("#humans .human .blood_via");
+		const blood_bag = document.querySelector("#blood_content > div.main_bag > div");
+		const center_via = document.querySelector(".center_via > .blood_via");
+		const blood_types = document.querySelectorAll(".blood_type");
+		let lastCalled;
+		addListeners();
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+		function callIfChildren(e) {
+			if (lastCalled) change();
+			if (e.target !== this) setRecipents(e);
+		}
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+		function addListeners() {
+			selector.addEventListener("click", callIfChildren);
+		}
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+		function reset() {
+			change();
+			blood_bag.style.height = "100px";
+			center_via.style.height = "0px";
+		}
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+		function change() {
+			lastCalled.target.classList.remove("highlight");
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+			for (let i = 0; i < blood_vias.length; i++) {
+				blood_vias[i].style.width = "0px";
+				blood_types[i].classList.remove("highlightText");
+			}
+		}
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+		function timeout(ms) {
+			return new Promise((resolve) => setTimeout(resolve, ms));
+		}
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+		async function setRecipents(e) {
+			e.target.classList.add("highlight");
+			lastCalled = e;
+
+			const donor = e.target.innerText;
+			for (let item of BLOOD_TYPES[donor]) {
+				const recipent_index = Object.keys(BLOOD_TYPES).indexOf(item);
+				const height = 50 + 50 * Math.floor(recipent_index / 2);
+				const blood_height = 125 - 25 * Math.floor(recipent_index / 2);
+				blood_bag.style.height = `${blood_height}px`;
+				center_via.style.height = `${height}px`;
+
+				await timeout(100);
+				blood_vias[recipent_index].style.width = "100%";
+				blood_types[recipent_index].classList.add("highlightText");
+			}
+		}
+		o_negative.click();
+	}
+
+	render() {
+		return (
+			<div>
+				<Head>
+					<title>Who Can Get My Blood | Romina Martín</title>
+					<link rel="icon" href="/favicon.ico" />
+				</Head>
+
+				<main>
+					<div id="content">
+						<h3>Donor's blood group:</h3>
+						<div id="blood_selector">
+							<div className="o_negative">O−</div>
+							<div>O+</div>
+							<div>A−</div>
+							<div>A+</div>
+							<div>B−</div>
+							<div>B+</div>
+							<div>AB−</div>
+							<div>AB+</div>
+						</div>
+						<div id="blood_content">
+							<div className="bar"></div>
+							<div className="main_bag">
+								<div className="blood"></div>
+							</div>
+						</div>
+						<div id="center_via_c">
+							<div className="center_via">
+								<div className="blood_via"></div>
+							</div>
+						</div>
+						<div id="humans">
+							<div className="human left">
+								<div className="scribble">
+									<span className="blood_type">O−</span>
+									<div className="head"></div>
+									<div className="body"></div>
+								</div>
+								<div className="via"></div>
+								<div className="blood_via"></div>
+							</div>
+							<div className="human right">
+								<div className="scribble">
+									<span className="blood_type">O+</span>
+									<div className="head"></div>
+									<div className="body"></div>
+								</div>
+								<div className="via"></div>
+								<div className="blood_via"></div>
+							</div>
+							<div className="human left">
+								<div className="scribble">
+									<span className="blood_type">A−</span>
+									<div className="head"></div>
+									<div className="body"></div>
+								</div>
+								<div className="via"></div>
+								<div className="blood_via"></div>
+							</div>
+							<div className="human right">
+								<div className="scribble">
+									<span className="blood_type">A+</span>
+									<div className="head"></div>
+									<div className="body"></div>
+								</div>
+								<div className="via"></div>
+								<div className="blood_via"></div>
+							</div>
+							<div className="human left">
+								<div className="scribble">
+									<span className="blood_type">B−</span>
+									<div className="head"></div>
+									<div className="body"></div>
+								</div>
+								<div className="via"></div>
+								<div className="blood_via"></div>
+							</div>
+							<div className="human right">
+								<div className="scribble">
+									<span className="blood_type">B+</span>
+									<div className="head"></div>
+									<div className="body"></div>
+								</div>
+								<div className="via"></div>
+								<div className="blood_via"></div>
+							</div>
+							<div className="human left">
+								<div className="scribble">
+									<span className="blood_type">AB−</span>
+									<div className="head"></div>
+									<div className="body"></div>
+								</div>
+								<div className="via"></div>
+								<div className="blood_via"></div>
+							</div>
+							<div className="human right">
+								<div className="scribble">
+									<span className="blood_type">AB+</span>
+									<div className="head"></div>
+									<div className="body"></div>
+								</div>
+								<div className="via"></div>
+								<div className="blood_via"></div>
+							</div>
+						</div>
+					</div>
+				</main>
+				<footer>
+					Original Work: <a href="https://codepen.io/RominaMartin/full/OJVdvRm">Romina Martín's Codepen</a>
+				</footer>
+			</div>
+		);
+	}
 }
